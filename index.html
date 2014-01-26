@@ -1,0 +1,141 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Jsonoid by icebreaker</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/icebreaker/jsonoid">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/icebreaker/jsonoid/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/icebreaker/jsonoid/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>Jsonoid</h1>
+          <p>A simple server-less NoSQL (JSON) document storage system.</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/icebreaker">icebreaker</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h1>
+<a name="jsonoid" class="anchor" href="#jsonoid"><span class="octicon octicon-link"></span></a>Jsonoid</h1>
+
+<p>A simple serverless NoSQL (JSON) document storage system.</p>
+
+<p><em>At this point, you should consider it pre-alpha quality and shouldn't
+even contemplate about using it in production.</em></p>
+
+<h2>
+<a name="getting-started" class="anchor" href="#getting-started"><span class="octicon octicon-link"></span></a>Getting Started</h2>
+
+<p>Install the <code>gem</code> via:</p>
+
+<div class="highlight highlight-bash"><pre>gem install jsonoid
+</pre></div>
+
+<p>or add it into your <code>Gemfile</code>:</p>
+
+<div class="highlight highlight-bash"><pre>gem <span class="s1">'jsonoid'</span>
+</pre></div>
+
+<p>Then create an <code>initializer</code> in the likes of:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="no">Jsonoid</span><span class="o">.</span><span class="n">configure</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+  <span class="n">config</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="no">File</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">__FILE__</span><span class="p">),</span> <span class="s1">'db'</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+
+<p>Create a model and cruise away:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">Post</span>
+  <span class="kp">include</span> <span class="no">Jsonoid</span><span class="o">::</span><span class="no">Document</span>
+  <span class="kp">include</span> <span class="no">Jsonoid</span><span class="o">::</span><span class="no">Timestamp</span>
+
+  <span class="n">before_save</span> <span class="ss">:add_byline</span>
+
+  <span class="n">field</span> <span class="ss">:title</span>
+  <span class="n">field</span> <span class="ss">:description</span>
+  <span class="n">field</span> <span class="ss">:author</span><span class="p">,</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="nb">String</span>
+  <span class="n">field</span> <span class="ss">:score</span><span class="p">,</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="nb">Integer</span>
+
+  <span class="kp">protected</span>
+
+  <span class="k">def</span> <span class="nf">add_byline</span>
+    <span class="nb">self</span><span class="o">.</span><span class="n">description</span> <span class="o">+=</span> <span class="s2">"</span><span class="se">\n</span><span class="si">#{</span><span class="nb">self</span><span class="o">.</span><span class="n">author</span><span class="si">}</span><span class="s2">"</span> <span class="k">unless</span> <span class="nb">self</span><span class="o">.</span><span class="n">author</span><span class="o">.</span><span class="n">nil?</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="n">post</span> <span class="o">=</span> <span class="no">Post</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:title</span> <span class="o">=&gt;</span> <span class="s1">'Hello World'</span><span class="p">)</span>
+<span class="n">post</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="s1">'The quick brown fox jumps over the lazy dog.'</span>
+<span class="n">post</span><span class="o">.</span><span class="n">author</span> <span class="o">=</span> <span class="s1">'Fox'</span>
+<span class="n">post</span><span class="o">.</span><span class="n">score</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">post</span><span class="o">.</span><span class="n">save</span>
+</pre></div>
+
+<div class="highlight highlight-ruby"><pre><span class="n">post</span> <span class="o">=</span> <span class="no">Post</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">'2cfe7b2e885f225746264b3c6c0beb57'</span><span class="p">)</span>
+<span class="n">post</span><span class="o">.</span><span class="n">destroy</span> <span class="k">unless</span> <span class="n">post</span><span class="o">.</span><span class="n">nil?</span>
+</pre></div>
+
+<p>Profit :)</p>
+
+<h2>
+<a name="todo" class="anchor" href="#todo"><span class="octicon octicon-link"></span></a>TODO</h2>
+
+<ul>
+<li>tests (rspec)</li>
+<li>documentation</li>
+<li>index and where() support</li>
+<li>metric tons of other things :)</li>
+</ul><h2>
+<a name="contribute" class="anchor" href="#contribute"><span class="octicon octicon-link"></span></a>Contribute</h2>
+
+<ul>
+<li>Fork the project.</li>
+<li>Make your feature addition or bug fix.</li>
+<li>Do <strong>not</strong> bump the version number.</li>
+<li>Send me a pull request. Bonus points for topic branches.</li>
+</ul><h2>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>Copyright (c) 2014, Mihail Szabolcs</p>
+
+<p>Jsonoid is provided <strong>as-is</strong> under the <strong>MIT</strong> license. For more information see
+LICENSE.</p>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-3042007-2");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
